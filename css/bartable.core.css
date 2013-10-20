@@ -16,6 +16,21 @@
   background: #eee;
   border-top: none;
 }
+.bartable > tbody > tr > td > span.bttg {
+  display: none;
+}
+.bartable.breakpoint > tbody > tr > td > span.bttg {
+  display: inline-block;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  -webkit-font-smoothing: antialiased;
+  padding-right: 10px;
+  font-size: 14px;
+  color: #888888;
+}
 .bartable > thead > tr > th {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -26,6 +41,24 @@
 }
 .bartable > thead > tr > th.bartable-sortable:hover {
   cursor: pointer;
+}
+.bartable > thead > tr > th > span.bartable-sort-indicator {
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  -webkit-font-smoothing: antialiased;
+  padding-left: 5px;
+  color: #888888;
+}
+.bartable > thead > tr > th.bartable-sorted > span.bartable-sort-indicator:before {
+  content: "\e114";
+}
+.bartable > thead > tr > th.bartable-sorted-desc > span.bartable-sort-indicator:before {
+  content: "\e113";
 }
 .bartable > tfoot .pagination {
   margin: 0;
@@ -53,7 +86,4 @@
 }
 .bartable-row-detail-value {
   display: table-cell;
-}
-.bartable-odd {
-  background-color: #f7f7f7;
 }
