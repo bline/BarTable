@@ -91,7 +91,7 @@ Data Attribute Configuration
 One of the main goals of BarTable was to make it completely configurable via data attributes. We wanted you to be able to look at the HTML markup and see exactly how the BarTable was going to function. Take a look at this markup for example:
 
 ```html
-<table class="footable" data-page-size="5">
+<table class="bartable" data-page-size="5">
   <thead>
     <tr>
       <th data-toggle="true">
@@ -113,7 +113,6 @@ One of the main goals of BarTable was to make it completely configurable via dat
   </thead>
 ```
 
-All available data attributes are listed in the [data attributes demo](http://fooplugins.com/footable-demos/?url=http://fooplugins.com/footable/demos/data-attributes.htm)
 
 Breakpoints
 -----------
@@ -150,7 +149,7 @@ Create a simple table (don't forget to set the data attributes for each column
 in your thead!):
 
 ```html
-<table class="footable">
+<table class="bartable">
   <thead>
     <tr>
       <th>Name</th>
@@ -181,20 +180,13 @@ in your thead!):
 1. **Include BarTable Core CSS**
 
    ```html
-<link href="path_to_your_css/footable.core.css" rel="stylesheet" type="text/css" />
+<link href="path_to_your_css/bartable.core.css" rel="stylesheet" type="text/css" />
 ```
 
 2. **[optional] Include BarTable Theme CSS**
 
-   > BarTable is now built to work with [Twitter Bootstrap](http://twitter.github.io/bootstrap) out of the box - WOOT!
+   > BarTable now requires [Twitter Bootstrap 3](http://twitter.github.io/bootstrap)
 
-   You can use one of our built-in themes if you want:
-
-   ```html
-<link href="path_to_your_css/footable.metro.css" rel="stylesheet" type="text/css" />
-```
-
-   Check out the [metro theme demo](http://fooplugins.com/footable-demos/?url=http://fooplugins.com/footable/demos/metro-theme.htm) or the [original theme demo](http://fooplugins.com/footable-demos/?url=http://fooplugins.com/footable/demos/old-theme.htm).
 
 3. **Include jQuery**
 
@@ -205,7 +197,7 @@ in your thead!):
 4. **Include BarTable jQuery Plugin**
 
     ```html
-<script src="path_to_your_js/footable.js" type="text/javascript"></script>
+<script src="path_to_your_js/bartable.js" type="text/javascript"></script>
 ```
 
 5. **Initialize BarTable!**
@@ -214,7 +206,7 @@ in your thead!):
 <script type="text/javascript">
     $(function () {
 
-        $('.footable').footable();
+        $('.bartable').bartable();
 
     });
 </script>
