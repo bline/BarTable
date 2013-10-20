@@ -79,7 +79,6 @@ Bartable = (table, options, id) ->
   class TableRowCollection
     transformIn: null
     transformOut: null
-    _noClone: false
     _noTransform: false
 
     constructor: ({@transformOut, @transformIn}) ->
@@ -95,6 +94,13 @@ Bartable = (table, options, id) ->
           node = node.cloneNode true
           @transformOut?(node)
           func node, index
+
+    clear: ->
+      tbody = @tbody
+      childs = tbody.children
+      while childs.length
+        tbody.removeChild childs[0]
+      true
 
     querySelectorAll: (selector, func) ->
       if @_noTransform
@@ -633,6 +639,7 @@ Bartable = (table, options, id) ->
         _.each bt.table.querySelectorAll(selector), (cell) ->
           if cell.style.display
             cell.style.display = "table-cell"
+          if headCell.style.display
             headCell.style.display = "table-cell"
       else
         _.each bt.table.querySelectorAll(selector), (cell) ->
@@ -746,7 +753,18 @@ Bartable = (table, options, id) ->
     $table = $(bt.table)
     $table.removeData("bartable_info").data("breakpoint", "").removeClass(cls.loading).removeClass cls.loaded
     $table.off "click.#{trg.toggleRow}"
+    bt.rowCollection.clear()
     bt.raise evt.reset
+
+  bt.clear = ->
+    bt.rowCollection.clear()
+    bt.redraw()
+
+  # because plugins may register events on external elements
+  bt.destroy = ->
+    bt.rowCollection.clear()
+    $.fn.bartable.global.plugins.destroy bt
+    $(bt.table).remove()
 
   bt.init()
   bt
@@ -888,11 +906,34 @@ $.fn.bartable.global =
     init: (instance) ->
       i = 0
 
-      while i < instance.plugins.length
-        try
+      if $.fn.bartable.global.options.debug
+        while i < instance.plugins.length
           instance.plugins[i]["init"] instance
-        catch err
-          console.error err  if $.fn.bartable.global.options.debug is true
-        i++
+          i++
+      else
+        while i < instance.plugins.length
+          try
+            instance.plugins[i]["init"] instance
+          catch err
+            # ignore
+          i++
+      i
+    destroy: (instance) ->
+      i = 0
+      if $.fn.bartable.global.options.debug
+        while i < instance.plugins.length
+          plugin = instance.plugins[i]
+          if plugin.destroy
+            plugin.destroy instance
+          i++
+      else
+        while i < instance.plugins.length
+          try
+            plugin = instance.plugins[i]
+            if plugin.destroy
+              plugin.destroy instance
+          catch err
+            # ignore
+          i++
       i
 
