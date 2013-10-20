@@ -7,8 +7,9 @@ defaults =
   previousText: "&lsaquo;"
   nextText: "&rsaquo;"
   lastText: "&raquo;"
+  pageSelect: ".page-select-list"
 
-pageInfo = (bt) ->
+PageInfo = (bt) ->
   $table = $(bt.table)
 
   @pageNavigation = $table.data("page-navigation") or bt.options.pageNavigation
@@ -18,16 +19,20 @@ pageInfo = (bt) ->
   @previousText = $table.data("page-previous-text") or bt.options.previousText
   @nextText = $table.data("page-next-text") or bt.options.nextText
   @lastText = $table.data("page-last-text") or bt.options.lastText
+  @pageSelect = $table.data("page-select") or bt.options.pageSelect
   @currentPage = 1
   @pageCount = 1
 
   @setPage = (page) ->
-    @currentPage = if page > @pageCount then @pageCount else page
-    @redraw()
+    page = if page > @pageCount then @pageCount else page
+    if @currentPage != page
+      @currentPage = page
+      @redraw()
 
   @setPageSize = (pageSize) ->
-    @pageSize = pageSize
-    @redraw()
+    if @pageSize != pageSize
+      @pageSize = pageSize
+      @redraw()
 
   @redraw = () ->
     $table.trigger 'paging_change'
@@ -42,7 +47,8 @@ Paginate = ->
     return if $(bt.table).data("page") is false
     p.bartable = bt
     $table = $(bt.table)
-    bt.pageInfo = new pageInfo bt unless bt.pageInfo
+    bt.pageInfo = new PageInfo bt unless bt.pageInfo
+    p.setupPageSelectEvents()
 
     triggerEvents = [
       'bartable_initialized'
@@ -56,6 +62,7 @@ Paginate = ->
   p.setupPaging = ->
     bt = p.bartable
     p.calculate()
+    p.setPageSelect()
     p.createNavigation()
     p.setOffsets()
 
@@ -135,37 +142,47 @@ Paginate = ->
     p.navInfo.pages = [first..last]
     p
 
+  p.setupPageSelectEvents = ->
+    bt = p.bartable
+    $select = p.findPageSelect()
+    return unless $select
+    $select
+      .off('change.bartable_paging')
+      .on 'change.bartable_paging', (e) ->
+        bt.pageInfo.setPageSize parseInt($(e.currentTarget).val(), 10)
+    p
+
+  p.setPageSelect = ->
+    bt = p.bartable
+    pageInfo = bt.pageInfo
+
+    $select = p.findPageSelect()
+    return unless $select
+
+    $select
+      .find("option[value!='#{pageInfo.pageSize}']")
+      .removeAttr('selected')
+    $select
+      .find("option[value='#{pageInfo.pageSize}']")
+      .attr('selected', 'selected')
+
   p.createNavigation = () ->
     bt = p.bartable
-    $nav = $(bt.table).find(bt.pageInfo.pageNavigation)
-    
-    #if we cannot find the navigation control within the table, then try find it outside
-    if $nav.length is 0
-      $nav = $(bt.pageInfo.pageNavigation)
-      
-    #if we still cannot find the control, then don't do anything
-    return if $nav.length is 0
-    
-    #if the nav is not a UL, then find or create a UL
-    unless $nav.is "ul"
-      $parent = $nav
-      $nav = $nav.find "ul:first"
-      if $nav.length is 0
-        $nav = $('<ul/>').appendTo $parent
-        $nav.addClass 'pagination pagination-sm'
+    pageInfo = bt.pageInfo
 
-    $nav.off('click.paging').on 'click.paging', 'a[href]', (e) ->
+    $nav = p.findNav()
+    return unless $nav
+
+    $nav.off('click.bartable_paging').on 'click.bartable_paging', 'a[href]', (e) ->
       e.preventDefault()
       pageInfo.setPage parseInt($(e.currentTarget).attr('href').slice(1), 10)
 
     $nav.find("li").remove()
     navInfo = p.navInfo
-    pageInfo = bt.pageInfo
     currentPage = parseInt pageInfo.currentPage, 10
     lastPage = navInfo.lastPage
     prevPage = currentPage - 1
     nextPage = currentPage + 1
-    pageInfo.control = $nav
 
     if navInfo.pages.length
       $first = $(""""<li><a href="#1">#{pageInfo.firstText}</a></li>""").appendTo $nav
@@ -190,6 +207,52 @@ Paginate = ->
     bt = p.bartable
     bt.displayStart = p.offsets.start
     bt.displayEnd = p.offsets.end
+    p
+
+  p.findPageSelect = ->
+    bt = p.bartable
+    pageInfo = bt.pageInfo
+
+    $select = pageInfo.select
+    unless $select
+      $select = $(bt.table).find(bt.pageInfo.pageSelect)
+      if $select.length is 0
+        $select = $(bt.pageInfo.pageSelect)
+      return null if $select.length is 0
+      pageInfo.select = $select
+
+    return $select
+
+  p.findNav = ->
+    bt = p.bartable
+    $nav = bt.pageInfo.control
+    unless $nav
+      $nav = $(bt.table).find(bt.pageInfo.pageNavigation)
+      #if we cannot find the navigation control within the table, then try find it outside
+      if $nav.length is 0
+        $nav = $(bt.pageInfo.pageNavigation)
+      
+      #if we still cannot find the control, then don't do anything
+      return null if $nav.length is 0
+
+      #if the nav is not a UL, then find or create a UL
+      unless $nav.is "ul"
+        $parent = $nav
+        $nav = $nav.find "ul:first"
+        if $nav.length is 0
+          $nav = $('<ul/>').appendTo $parent
+          $nav.addClass 'pagination pagination-sm'
+      bt.pageInfo.control = $nav
+
+    return $nav
+
+  p.destroy = ->
+    console.log "pagination destroyed"
+    bt = p.bartable
+    $nav = p.findNav()
+    $nav.off 'click.bartable_paging' if $nav
+    $select = p.findPageSelect()
+    $select.off 'change.bartable_paging' if $select
 
   p
 
