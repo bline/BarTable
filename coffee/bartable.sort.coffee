@@ -105,7 +105,6 @@ Sort = ->
       e.column.data.sort = e.column.data.sort or {}
       e.column.data.sort.initial = $th.data("sort-initial") or false
       e.column.data.sort.ignore = $th.data("sort-ignore") or false
-      e.column.data.sort.selector = $th.data("sort-selector") or null
       e.column.data.sort.match = $th.data("sort-match") or e.column.data.index
 
     $(bt.table).unbind(".sorting").bind events
