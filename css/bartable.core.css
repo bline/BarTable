@@ -1,0 +1,59 @@
+
+.bartable {
+  width: 100%;
+  /** SORTING **/
+
+  /** PAGINATION **/
+
+}
+.bartable.breakpoint > tbody > tr.bartable-detail-show > td {
+  border-bottom: none;
+}
+.bartable.breakpoint > tbody > tr:hover:not(.bartable-row-detail) {
+  cursor: pointer;
+}
+.bartable.breakpoint > tbody > tr > td.bartable-cell-detail {
+  background: #eee;
+  border-top: none;
+}
+.bartable > thead > tr > th {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: -moz-none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.bartable > thead > tr > th.bartable-sortable:hover {
+  cursor: pointer;
+}
+.bartable > tfoot .pagination {
+  margin: 0;
+}
+.bartable.no-paging .hide-if-no-paging {
+  display: none;
+}
+.bartable-row-detail-inner {
+  display: table;
+}
+.bartable-row-detail-row {
+  display: table-row;
+  line-height: 1.5em;
+}
+.bartable-row-detail-group {
+  display: block;
+  line-height: 2em;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+.bartable-row-detail-name {
+  display: table-cell;
+  font-weight: bold;
+  padding-right: 0.5em;
+}
+.bartable-row-detail-value {
+  display: table-cell;
+}
+.bartable-odd {
+  background-color: #f7f7f7;
+}
