@@ -2,7 +2,7 @@ BarTable
 ========
 
 BarTable is a fork of
-[BarTable](http://fooplugins.com/plugins/footable-jquery). BarTable was created
+[FooTable](http://fooplugins.com/plugins/footable-jquery). BarTable was created
 out of a need for speed on larger sets of data (~10000) as well as the ability
 to work with updates/additions/removals from the data. At this point, not much
 of the original code from BarTable remains, only the plugin framework and basic
