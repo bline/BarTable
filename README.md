@@ -1,32 +1,76 @@
-FooTable
+BarTable
 ========
 
-FooTable is a jQuery plugin that aims to make HTML tables on smaller devices look awesome - No matter how many columns of data you may have in them.
+BarTable is a fork of
+[BarTable](http://fooplugins.com/plugins/footable-jquery). BarTable was created
+out of a need for speed on larger sets of data (~10000) as well as the ability
+to work with updates/additions/removals from the data. At this point, not much
+of the original code from BarTable remains, only the plugin framework and basic
+layout (which was well written!). 
 
-[Home Page](http://fooplugins.com/plugins/footable-jquery "Visit the FooTable Homepage") |
-[WordPress Plugin (free)](http://fooplugins.com/plugins/footable-lite/) |
-[Demos](http://fooplugins.com/footable-demos/)
+Features that were removed:
 
-![FooTable](https://raw.github.com/bradvin/FooTable/V2/screenshot.jpg "FooTable")
+* column groups (probably not going to)
+* filter plugin, (todo)
+* customizing the dropdown html for phone/tablet rendering is no longer
+  possible. (todo)
+
+Technical changes:
+
+* internal dom element stores all rows, only displayed rows are added to the
+  document.
+* for display, a new tbody element is created with the range we are displaying
+  and appended to the dom. this cuts down on rerendering and makes things very
+  smooth
+* sorting is done on internal dom element
+* paging only needs to set the range we are displaying and create the paging
+  toolbar
+* all additions/removals/updates are done on internal dom element and pushed to
+  document dom via redraw replacing tbody
+* very optimized for speed, none of the functions that deal with the rows are
+  using jquery. this resulted in loss of ie8 support but gained more than 100%
+  speed increase
+* updated to work with bootstrap3, no longer needs internal font set, as a
+  result, this plugin requires [bootstrap3](http://getbootstrap.com/)
+* table stipping is done with bootstrap3 now, we no longer add class to every
+  other tr in the table (this was way too slow).
+* use of [underscore.js](http://underscorejs.org/), so is now required
+
+TODO
+----
+
+* filter plugin
+* ability to customize breakpoint dropdown html
+* remove nth column selectors so more browsers are supported
+* create examples
+* create demos
+* create documentions
+* better tests for required libraries
+* better loading indicator
+* more optimizations ;)
 
 Features
 --------
 
 * Hide certain columns at different sizes
 * Configuration via data attributes
-* Built to work with Bootstrap
+* Built to work with Bootstrap3
 * Easy to theme
 * Sorting
-* Filtering
 * Pagination
 * Easy to extend with add-ons
+* Extremely fast
+* Ability to load and sort large data sets (~10,000)
 
-What Is FooTable?
+
+What Is BarTable?
 -----------------
 
-FooTable is a jQuery plugin that transforms your HTML tables into expandable responsive tables. This is how it works:
+BarTable is a jQuery plugin that transforms your HTML tables into expandable
+responsive tables. This is how it works:
 
-1. It hides certain columns of data at different resolutions (we call these breakpoints).
+1. It hides certain columns of data at different resolutions (we call these
+   breakpoints).
 2. Rows become expandable to reveal any hidden data.
 
 So simple! Any hidden data can always be seen just by clicking the row.
@@ -34,20 +78,20 @@ So simple! Any hidden data can always be seen just by clicking the row.
 Demos
 -----
 
-Check out the growing number of [FooTable demos](http://fooplugins.com/footable-demos/) (with built-in documentation!)
+TODO
 
 Documentation
 -------------
 
-The docs are built into the [demos](http://fooplugins.com/footable-demos/)! On every demo page, there is a docs tab that outlines how to use the specific feature.
+TODO
 
 Data Attribute Configuration
 ----------------------------
 
-One of the main goals of FooTable was to make it completely configurable via data attributes. We wanted you to be able to look at the HTML markup and see exactly how the FooTable was going to function. Take a look at this markup for example:
+One of the main goals of BarTable was to make it completely configurable via data attributes. We wanted you to be able to look at the HTML markup and see exactly how the BarTable was going to function. Take a look at this markup for example:
 
 ```html
-<table class="footable" data-filter="#filter" data-page-size="5">
+<table class="footable" data-page-size="5">
   <thead>
     <tr>
       <th data-toggle="true">
@@ -74,7 +118,8 @@ All available data attributes are listed in the [data attributes demo](http://fo
 Breakpoints
 -----------
 
-FooTable works with the concepts of "breakpoints", which are different table widths we care about. The default breakpoints are:
+BarTable works with the concepts of "breakpoints", which are different table
+widths we care about. The default breakpoints are:
 
 ```javascript
 breakpoints: {
@@ -83,18 +128,26 @@ breakpoints: {
 }
 ```
 
-So looking at the markup in the *Data Attribute Configuration* section, you can now tell that the *Job Title*, *DOB* and *Status* columns will be hidden when the table width is below 480 (phone).
+So looking at the markup in the *Data Attribute Configuration* section, you can
+now tell that the *Job Title*, *DOB* and *Status* columns will be hidden when
+the table width is below 480 (phone).
 
 There are also two built-in breakpoints called "default" and "all".
 
-The "default" breakpoint is the fallback breakpoint for when the current table width is larger than any defined breakpoint. Looking at the above JS snippet the "default" breakpoint would be applied once the table width is larger than 1024 (tablet).
+The "default" breakpoint is the fallback breakpoint for when the current table
+width is larger than any defined breakpoint. Looking at the above JS snippet
+the "default" breakpoint would be applied once the table width is larger than
+1024 (tablet).
 
-The "all" breakpoint is pretty straight forward in it's use. You can always hide a column on any table width by applying the *data-hide="all"* attribute to the header.
+The "all" breakpoint is pretty straight forward in it's use. You can always
+hide a column on any table width by applying the *data-hide="all"* attribute to
+the header.
 
 Usage
 -----
 
-Create a simple table (don't forget to set the data attributes for each column in your thead!):
+Create a simple table (don't forget to set the data attributes for each column
+in your thead!):
 
 ```html
 <table class="footable">
@@ -125,15 +178,15 @@ Create a simple table (don't forget to set the data attributes for each column i
 </table>
 ```
 
-1. **Include FooTable Core CSS**
+1. **Include BarTable Core CSS**
 
    ```html
 <link href="path_to_your_css/footable.core.css" rel="stylesheet" type="text/css" />
 ```
 
-2. **[optional] Include FooTable Theme CSS**
+2. **[optional] Include BarTable Theme CSS**
 
-   > FooTable is now built to work with [Twitter Bootstrap](http://twitter.github.io/bootstrap) out of the box - WOOT!
+   > BarTable is now built to work with [Twitter Bootstrap](http://twitter.github.io/bootstrap) out of the box - WOOT!
 
    You can use one of our built-in themes if you want:
 
@@ -149,13 +202,13 @@ Create a simple table (don't forget to set the data attributes for each column i
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
 ```
 
-4. **Include FooTable jQuery Plugin**
+4. **Include BarTable jQuery Plugin**
 
     ```html
 <script src="path_to_your_js/footable.js" type="text/javascript"></script>
 ```
 
-5. **Initialize FooTable!**
+5. **Initialize BarTable!**
 
    ```html
 <script type="text/javascript">
@@ -170,27 +223,22 @@ Create a simple table (don't forget to set the data attributes for each column i
 Extensible
 ----------
 
-Another goal of FooTable was to make it easily extensible. If you look at the code you will see that there is a plugin framework within the plugin, so extra mods can be attached just by including another javascript file.
+Another goal of BarTable was to make it easily extensible. If you look at the code you will see that there is a plugin framework within the plugin, so extra mods can be attached just by including another javascript file.
 
-We also didn't want to bloat FooTable, so you can only use what you need and leave out everything else.
+We also didn't want to bloat BarTable, so you can only use what you need and leave out everything else.
 
 Working add-ons:
 
 * sorting
-* filtering
 * pagination (thanks @awc737)
-* striping (thanks @OliverRC)
-
-Other add-on ideas so far are:
-
-* conditional formatting
-* json loading
-* column picker
 
 Thanks
 ------
 
-We would not have created FooTable without inspiration from others. Thanks must be given to:
+Thanks to [FooTable team](http://fooplugins.com/plugins/footable-jquery) for
+creating the starting point for BarTable. Their code was a pleasure to gut :)
+
+This is a list of the thanks from original FooTable README
 
 * Catalin for his [original table CSS](http://www.red-team-design.com/practical-css3-tables-with-rounded-corners)
 * [@awc737](https://github.com/awc737) for creating the pagination add-on

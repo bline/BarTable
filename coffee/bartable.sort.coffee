@@ -38,6 +38,12 @@ Sort = ->
   p.init = (bt) ->
     p.bartable = bt
     cls = bt.options.classes.sort
+
+    # composed shortcuts
+    cls.desc = cls.descending + ' ' + cls.descendingIcon
+    cls.asc = cls.sorted + ' ' + cls.sortedIcon
+    cls.ind = cls.indicator + ' ' + cls.indicatorIcon
+
     evts = bt.options.events
     ids = bt.options.ids
     $table = $(bt.table)
@@ -75,7 +81,7 @@ Sort = ->
 
         if column.sort.ignore isnt true and not $th.hasClass(cls.sortable)
           $th.addClass cls.sortable
-          $("<span />").addClass(cls.indicator).appendTo $th
+          $("<span />").addClass(cls.ind).appendTo $th
 
       for k, column of bt.columns
         if column.sort.initial
@@ -136,12 +142,14 @@ Sort = ->
     ascending = sortInfo.ascending
 
     $th = $table.find("thead##{ids.thead} > tr:last-child > th:eq(#{column.index}), thead##{ids.thead} > tr:last-child > td:eq(#{column.index})").first()
-    $table.find("thead##{ids.thead} > tr:last-child > th, thead##{ids.thead} > tr:last-child > td").not($th).removeClass cls.sorted + " " + cls.descending
+    $table.find("thead##{ids.thead} > tr:last-child > th, thead##{ids.thead} > tr:last-child > td")
+      .not($th)
+      .removeClass cls.asc + ' ' + cls.desc
     ascending = $th.hasClass(cls.sorted)  if ascending is `undefined`
     if ascending
-      $th.removeClass(cls.descending).addClass cls.sorted
+      $th.removeClass(cls.desc).addClass cls.asc
     else
-      $th.removeClass(cls.sorted).addClass cls.descending
+      $th.removeClass(cls.asc).addClass cls.desc
 
   p.doSort = ->
     bt = p.bartable
@@ -214,8 +222,11 @@ defaults =
     sort:
       sortable: "bartable-sortable"
       sorted: "bartable-sorted"
+      sortedIcon: 'glyphicon glyphicon-chevron-down'
       descending: "bartable-sorted-desc"
+      descendingIcon: "glyphicon glyphicon-chevron-up"
       indicator: "bartable-sort-indicator"
+      indicatorIcon: "glyphicon glyphicon-sort"
 
   events:
     sort:
