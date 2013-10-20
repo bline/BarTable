@@ -9,6 +9,12 @@
 .bartable.breakpoint > tbody > tr.bartable-detail-show > td {
   border-bottom: none;
 }
+.bartable.breakpoint > tbody > tr.bartable-detail-show > td > span.bttg:before {
+  content: "\e016";
+}
+.bartable.breakpoint > tbody > tr > td > span.bttg:before {
+  content: "\e015";
+}
 .bartable.breakpoint > tbody > tr:hover:not(.bartable-row-detail) {
   cursor: pointer;
 }
@@ -21,13 +27,14 @@
 }
 .bartable.breakpoint > tbody > tr > td > span.bttg {
   display: inline-block;
+  font-family: 'Glyphicons Halflings';
   speak: none;
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
   text-transform: none;
   -webkit-font-smoothing: antialiased;
-  padding-right: 10px;
+  padding-right: 5px;
   font-size: 14px;
   color: #888888;
 }
