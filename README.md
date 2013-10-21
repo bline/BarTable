@@ -35,8 +35,8 @@ Technical changes:
 * table stipping is done with bootstrap3 now, we no longer add class to every
   other tr in the table (this was way too slow).
 * use of [underscore.js](http://underscorejs.org/), so is now required
-* unfortunately jquery has now builtin way to get notified on remove. You must
-  call a `bartable.destroy()` method instead of remove so it can clean up
+* unfortunately jquery has no builtin way to get notified on remove. You must
+  call a `bartable.destroy()` method instead of `$table.remove()` so it can clean up
   internal DOM elements which are not cleaned up by Javascript. If someone
   knows a work-around for this, please let me know.
 
