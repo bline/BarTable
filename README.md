@@ -177,30 +177,37 @@ in your thead!):
 </table>
 ```
 
-1. **Include BarTable Core CSS**
+1. **Include bootstrap3 CSS**
+
+    ```html
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" type="text/css" />
+```
+
+2. **Include BarTable Core CSS**
 
    ```html
 <link href="path_to_your_css/bartable.core.css" rel="stylesheet" type="text/css" />
 ```
 
-2. **[optional] Include BarTable Theme CSS**
-
-   > BarTable now requires [Twitter Bootstrap 3](http://twitter.github.io/bootstrap)
-
-
-3. **Include jQuery**
+3. **Include underscore**
 
     ```html
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
+<script src="//cdn.jsdelivr.net/underscorejs/1.5.2/underscore-min.js" type="text/javascript"></script>
 ```
 
-4. **Include BarTable jQuery Plugin**
+4. **Include jQuery**
+
+    ```html
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
+```
+
+5. **Include BarTable jQuery Plugin**
 
     ```html
 <script src="path_to_your_js/bartable.js" type="text/javascript"></script>
 ```
 
-5. **Initialize BarTable!**
+6. **Initialize BarTable!**
 
    ```html
 <script type="text/javascript">
