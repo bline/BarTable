@@ -22,6 +22,8 @@ PageInfo = (bt) ->
   @pageSelect = $table.data("page-select") or bt.options.pageSelect
   @currentPage = 1
   @pageCount = 1
+  @control = null
+  @select = null
 
   @setPage = (page) ->
     page = if page > @pageCount then @pageCount else page
@@ -42,6 +44,7 @@ PageInfo = (bt) ->
 Paginate = ->
   p = this
   p.name = "Bartable Paginate"
+  p.appendedNav = false
   p.init = (bt) ->
     return unless bt.options.paginate is true
     return if $(bt.table).data("page") is false
@@ -240,6 +243,7 @@ Paginate = ->
         $parent = $nav
         $nav = $nav.find "ul:first"
         if $nav.length is 0
+          p.appendedNav = true
           $nav = $('<ul/>').appendTo $parent
           $nav.addClass 'pagination pagination-sm'
       bt.pageInfo.control = $nav
@@ -250,9 +254,17 @@ Paginate = ->
     console.log "pagination destroyed"
     bt = p.bartable
     $nav = p.findNav()
-    $nav.off 'click.bartable_paging' if $nav
+    if $nav
+      $nav.off 'click.bartable_paging'
+      $nav.find('li').remove()
+      $nav.remove() if p.appendedNav
     $select = p.findPageSelect()
     $select.off 'change.bartable_paging' if $select
+    delete bt.pageInfo.control
+    delete bt.pageInfo.select
+    delete bt.pageInfo
+    delete p.bartable
+    null
 
   p
 
