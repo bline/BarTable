@@ -198,7 +198,7 @@ Sort = ->
     `for (i = 1; i < tbodyLen; ++i) {
       tr = colBodyChilds[i];
       insertPosition = sortedIndex(tbodyChildren, i, tr, function (row) {
-        parse(row.cells[match], type);
+        return parse(row.cells[match], type);
       });
       child = tbodyChildren[insertPosition];
       tbody.insertBefore(tr.cloneNode(), child);
