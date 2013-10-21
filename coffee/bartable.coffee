@@ -197,7 +197,7 @@ Bartable = (table, options, id) ->
       tbody = @tbody
       childs = tbody.children
       for id in ids
-        tbody.removeChild childs[id]
+        tbody.removeChild childs.namedItem id
       true
 
     removeById: (id) ->
@@ -666,35 +666,35 @@ Bartable = (table, options, id) ->
     bt.rowCollection.getById id
 
   bt.replaceRows = (rows) ->
+    if _.isString rows
+      tbody = document.createElement 'tbody'
+      tbody.innerHTML = rows
+      rows = tbody.children
+
     size = bt.rowCollection.size()
-    _.each rows, (row) ->
+    hasRows = !! rows.length
+    while rows.length
+      row = rows[0]
       # get the new row position, insertion sort
-      if size
-        bt.rowCollection.removeById row.getAttribute attrs.trow
-        insertPosition = bt.insertPosition.get row, size
-        bt.rowCollection.addAt row, insertPosition
-      else
-        size++
-        bt.rowCollection.add row
+      bt.rowCollection.removeById row.getAttribute attrs.trow
+      insertPosition = bt.insertPosition.get row, size
+      bt.rowCollection.addAt row, insertPosition
 
-
-    if rows.length
+    if hasRows
       bt.raise evt.rowsChanged
       bt.redraw()
     bt
 
-  bt.removeRows = (rows) ->
-    bt.rowCollection.removeRows rows
-    if rows.length
-      bt.raise evt.rowsRemoved
-      bt.redraw()
-    bt
-
   bt.addRows = (rows, redraw) ->
-    size = bt.rowCollection.size()
-    _.each rows, (row, index) ->
-      row = row.cloneNode()
+    if _.isString rows
+      tbody = document.createElement 'tbody'
+      tbody.innerHTML = rows
+      rows = tbody.children
 
+    size = bt.rowCollection.size()
+    origSize = size
+    while rows.length
+      row = rows[0]
       if size
         insertPosition = bt.insertPosition.get row, size
         bt.rowCollection.addAt row, insertPosition
@@ -702,7 +702,7 @@ Bartable = (table, options, id) ->
         bt.rowCollection.add row
       size++
 
-    if rows.length and redraw isnt false
+    if size != origSize and redraw isnt false
       bt.raise evt.rowsAdded
       bt.redraw()
     bt
