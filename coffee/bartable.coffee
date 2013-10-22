@@ -252,9 +252,12 @@ Bartable = (table, options, id) ->
     registered: []
     register: (func) ->
       @registered.push func
-    get: (row, def) ->
+    get: (row, size) ->
+      # the default is to insert at the end.
+      def = size
       for func in @registered
-        def = func row, def
+        # pass the size along as an optimization for insertion sorting
+        def = func row, def, size
       def
 
   # This object simply houses all the timers used in the BarTable.
@@ -677,7 +680,7 @@ Bartable = (table, options, id) ->
       row = rows[0]
       # get the new row position, insertion sort
       bt.rowCollection.removeById row.getAttribute attrs.trow
-      insertPosition = bt.insertPosition.get row, size
+      insertPosition = bt.insertPosition.get row, size - 1
       bt.rowCollection.addAt row, insertPosition
 
     if hasRows
