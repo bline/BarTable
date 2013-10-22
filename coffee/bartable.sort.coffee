@@ -47,7 +47,7 @@ Sort = ->
     return if bt.options.sort isnt true
 
     # insertion sort, no need to resort when rows are added/changed/removed
-    bt.insertPosition.register (row, def) ->
+    bt.insertPosition.register (row, def, size) ->
       if p.currentSortInfo
         sortInfo = p.currentSortInfo
       else if p.initialSortInfo
@@ -61,10 +61,10 @@ Sort = ->
       parse = bt.parse
       childs = bt.rowCollection.tbody.children
       if sortInfo.ascending
-        return p._sortedIndex childs, def, row, (row) ->
+        return p._sortedIndex childs, size, row, (row) ->
           parse row.cells[match], type
       else
-        return p._sortedIndexDesc childs, def, row, (row) ->
+        return p._sortedIndexDesc childs, size, row, (row) ->
           parse row.cells[match], type
 
     events[evts.initialized + ".sorting"] = (e) ->
