@@ -11,6 +11,7 @@ Package.on_use(function (api) {
   api.use(['jquery', 'underscore', 'coffeescript'], client);
   jsFiles = [
     'bartable.coffee',
+    'bartable.filter.coffee',
     'bartable.sort.coffee',
     'bartable.paginate.coffee'
   ];
