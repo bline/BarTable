@@ -11,7 +11,6 @@ layout (which was well written!).
 Features that were removed:
 
 * column groups (probably not going to)
-* filter plugin, (todo)
 * customizing the dropdown html for phone/tablet rendering is no longer
   possible. (todo)
 
