@@ -14,41 +14,6 @@
 # *
 # * Date: 21 Sep 2013
 #
-# The number of millseconds to wait before triggering the react event
-# The different screen resolution breakpoints
-#the selector used to find the column data in the thead
-#trigger this event to force BarTable to reinitialize
-#trigger this event to force BarTable to resize
-#trigger this event to force BarTable to redraw
-#fires when the BarTable has already been initialized
-#fires before BarTable starts initializing
-#fires after BarTable has finished initializing
-#fires before BarTable resizes
-#fires after BarTable has resized
-#fires after BarTable has redrawn
-#fires inside the resize function, when a breakpoint is hit
-#fires when setting up column data. Plugins should use this event to capture their own info about a column
-#fires when a row is removed
-#fires when BarTable is reset
-# Whether or not to log information to the console.
-
-#/<summary>Simple validation of the <paramref name="plugin"/> to make sure any members called by BarTable actually exist.</summary>
-#/<param name="plugin">The object defining the plugin, this should implement a string property called "name" and a function called "init".</param>
-# An array containing all registered plugins.
-
-#/<summary>Registers a <paramref name="plugin"/> and its default <paramref name="options"/> with BarTable.</summary>
-#/<param name="plugin">The plugin that should implement a string property called "name" and a function called "init".</param>
-#/<param name="options">The default options to merge with the BarTable's base options.</param>
-
-#/<summary>Loops through all registered plugins and calls the "init" method supplying the current <paramref name="instance"/> of the BarTable as the first parameter.</summary>
-#/<param name="instance">The current instance of the BarTable that the plugin is being initialized for.</param>
-
-#/<summary>The main constructor call to initialize the plugin using the supplied <paramref name="options"/>.</summary>
-#/<param name="options">
-#/<para>A JSON object containing user defined options for the plugin to use. Any options not supplied will have a default value assigned.</para>
-#/<para>Check the documentation or the default options object above for more information on available options.</para>
-#/</param>
-#merge user and default options
 
 Bartable = (table, options, id) ->
 
@@ -79,10 +44,15 @@ Bartable = (table, options, id) ->
   class TableRowCollection
     transformIn: null
     transformOut: null
+    unfilteredSize: 0
+    filters: []
     _noTransform: false
 
     constructor: ({@transformOut, @transformIn}) ->
       @tbody = document.createElement 'tbody'
+
+    registerFilter: (func) ->
+      @filters.push func
 
     each: (func) ->
       if @_noTransform
@@ -98,6 +68,7 @@ Bartable = (table, options, id) ->
     clear: ->
       tbody = @tbody
       childs = tbody.children
+      @unfilteredSize = 0
       while childs.length
         tbody.removeChild childs[0]
       true
@@ -140,24 +111,73 @@ Bartable = (table, options, id) ->
 
     # optimized
     range: (start, end, func) ->
-      `var i = start, childs = this.tbody.children, node;
-      if (end >= childs.length) end = childs.length - 1;
+      `var i = start, childs = this.tbody.children, node, childslen = childs.length
+      if (end >= childslen) end = childslen - 1;
       for (; i <= end; ++i) {
-        node = childs[i].cloneNode(true);
+        node = childs[i]
+        if (node.hasAttribute('data-filtered')) {
+          end++;
+          if (end >= childslen) end = childslen - 1
+          continue;
+        }
+        node = node.cloneNode(true);
         if (typeof this.transformOut == 'function') this.transformOut(node);
         func(node);
       }`
       true
 
+    filterCheckRow: (row) ->
+      filters = @filters
+      filterslen = filters.length
+      i = 0
+      filtered = false
+      while i < filterslen
+        if filters[i] row
+          filtered = true
+          break
+        ++i
+      if filtered
+        row.setAttribute 'data-filtered', '1'
+      else
+        ++@unfilteredSize
+      return
+
+    filterCheckAll: ->
+      filters = @filters
+      unfilteredSize = 0
+      filterslen = filters.length
+      return unless filterslen
+      childs = @tbody.children
+      childslen = childs.length
+      e  = 0
+      while e < childslen
+        row = childs[e]
+        i = 0
+        filtered = false
+        while i < filterslen
+          if filters[i] row
+            filtered = true
+            break
+          ++i
+        if filtered
+          row.setAttribute 'data-filtered', '1'
+        else
+          row.removeAttribute 'data-filtered'
+          ++unfilteredSize
+        ++e
+      @unfilteredSize = unfilteredSize
+      return
 
     add: (row) ->
       @transformIn?(row)
+      @filterCheckRow row
       @tbody.appendChild row
       row
 
     addAt: (row, position) ->
       curRow = @_item position
       @transformIn?(row)
+      @filterCheckRow row
       if curRow
         @tbody.insertBefore row, curRow
       else
@@ -180,16 +200,17 @@ Bartable = (table, options, id) ->
 
     append: (row) ->
       @transformIn?(row) unless @_noTransform
+      @filterCheckRow row
       @tbody.appendChild row
       row
 
     prepend: (row) ->
-      @transformIn?(row) unless @_noTransform
-      @tbody.prepend row
+      @addAt row, 0
       row
 
     removeRows: (rows) ->
       _.each rows, (row) =>
+        @unfilteredSize-- unless row.hasAttribute 'data-filtered'
         @tbody.removeChild row
 
     # optimized
@@ -197,21 +218,25 @@ Bartable = (table, options, id) ->
       tbody = @tbody
       childs = tbody.children
       for id in ids
-        tbody.removeChild childs.namedItem id
+        row = childs.namedItem id
+        @unfilteredSize-- unless row.hasAttribute 'data-filtered'
+        tbody.removeChild row
       true
 
     removeById: (id) ->
       row = @_getById id
+      @unfilteredSize-- unless row.hasAttribute 'data-filtered'
       row = @tbody.removeChild row
       row
 
     removeByPosition: (position) ->
       row = @_item position
+      @unfilteredSize-- unless row.hasAttribute 'data-filtered'
       row = @tbody.removeChild row
       row
 
     size: () ->
-      @tbody.children.length
+      @unfilteredSize
 
 
   #/<summary>Inits a new instance of the plugin.</summary>
@@ -466,7 +491,7 @@ Bartable = (table, options, id) ->
     for value in values
       detailHtml += """
         <tr>
-          <td class="text-right text-primary">
+          <td class="success">
             #{value.name}
           </td>
           <td class="text-center">
@@ -610,7 +635,15 @@ Bartable = (table, options, id) ->
     newTbody = document.createElement 'tbody'
     newTbody.className = tbody.className
     newTbody.setAttribute 'id', tbody.getAttribute 'id'
+
+    # collect detail rows we are displaying
+    detailIds = {}
+    _.each tbody.querySelectorAll("tr.#{cls.detailShow}"), (row) ->
+      detailIds[row.getAttribute 'data-btid'] = 1
+
     bt.rowCollection.range start, end, (row) ->
+      if detailIds[row.getAttribute 'data-btid']
+        row.className = (row.className || '') + ' ' + cls.detailShow
       newTbody.appendChild row
 
     bt.table.replaceChild newTbody, tbody
@@ -764,10 +797,10 @@ Bartable = (table, options, id) ->
     bt.redraw()
 
   # because plugins may register events on external elements
-  bt.destroy = ->
+  # and we need to cleanup any internal DOM elements that were created
+  bt.destroy = () ->
     bt.rowCollection.clear()
     $.fn.bartable.global.plugins.destroy bt
-    $(bt.table).remove()
 
   bt.init()
   bt
@@ -921,20 +954,20 @@ $.fn.bartable.global =
             # ignore
           i++
       i
-    destroy: (instance) ->
+    destroy: (instance, remove) ->
       i = 0
       if $.fn.bartable.global.options.debug
         while i < instance.plugins.length
           plugin = instance.plugins[i]
           if plugin.destroy
-            plugin.destroy instance
+            plugin.destroy instance, remove
           i++
       else
         while i < instance.plugins.length
           try
             plugin = instance.plugins[i]
             if plugin.destroy
-              plugin.destroy instance
+              plugin.destroy instance, remove
           catch err
             # ignore
           i++
