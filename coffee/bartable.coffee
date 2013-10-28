@@ -459,55 +459,37 @@ Bartable = (table, options, id) ->
 
   bt.createOrUpdateDetailRow = (actualRow) ->
     $row = $(actualRow)
-    $next = $row.next()
-    values = []
-    return null  if $row.is(":hidden") #if the row is hidden for some reason (perhaps filtered) then get out of here
-    bt.raise evt.rowDetailUpdating,
-      row: $row
-      detail: $next
+    detailRow = bt.getDetailRow actualRow
+    return null unless detailRow
+    $detailRow = $(detailRow)
+    $row.after $detailRow
+    $detailRow
 
-    $row.find("> td:hidden").each ->
-      index = $(this).index()
+  bt.getDetailRow = (row) ->
+    values = []
+    colspan = 0
+    _.each row.children, (cell, index) ->
+      # it's visible
+      if cell.style.display != "none"
+        colspan++
+        return true
+
       column = bt.columns[index]
       name = column.name
       return true  if column.ignore is true
       values.push
         name: name
-        value: bt.parse(this, column)
-        display: $.trim($(this).html())
+        value: bt.parse(cell, column)
+        display: cell.innerHTML
       true
 
     return null  if values.length is 0 #return if we don't have any data to show
-    colspan = $row.find("> td:visible").length
-    exists = $next.hasClass(cls.detail)
-    unless exists # Create
-      $next = $("<tr data-bartable_detail=\"1\" class=\"" + cls.detail + "\"><td class=\"" + cls.detailCell + "\"></td></tr>")
-      $row.after $next
-    $detail = $next.find("> td:first").attr "colspan", colspan
-    $details = $('<div class="table-responsive"/>')
-
-    # XXX make more customizable, uses Twitter Bootstrap 3 table defs
-    detailHtml = """<table class="table table-condensed table-bordered"><tbody>"""
-    for value in values
-      detailHtml += """
-        <tr>
-          <td class="success">
-            #{value.name}
-          </td>
-          <td class="text-center">
-            #{value.display}
-          </td>
-        </tr>
-        """
-    detailHtml += "</tbody></table>"
-    $details.append detailHtml
-
-    $detail.empty().append $details
-    bt.raise evt.rowDetailUpdated,
-      row: $row
-      detail: $next
-
-    $next
+    detailRow = document.createElement 'tr'
+    detailRow.setAttribute 'data-bartable_detail', '1'
+    detailRow.className = cls.detail
+    detailHtml =  """<td colspan="#{colspan}" class="#{cls.detailCell}">#{opt.createDetails values, row}</td>"""
+    detailRow.innerHTML = detailHtml
+    return detailRow
 
 
   bt.parse = (cell, type) ->
@@ -628,6 +610,7 @@ Bartable = (table, options, id) ->
   bt.redraw = ->
     $table = $(bt.table)
     $table.addClass cls.loading
+    breakpointName = $table.data("breakpoint")
     tbody = bt.table.querySelector("tbody##{ids.tbody}")
 
     {start, end} = bt.getRangeInfo()
@@ -636,15 +619,22 @@ Bartable = (table, options, id) ->
     newTbody.className = tbody.className
     newTbody.setAttribute 'id', tbody.getAttribute 'id'
 
-    # collect detail rows we are displaying
     detailIds = {}
     _.each tbody.querySelectorAll("tr.#{cls.detailShow}"), (row) ->
       detailIds[row.getAttribute 'data-btid'] = 1
 
+    # collect detail rows we are displaying
     bt.rowCollection.range start, end, (row) ->
-      if detailIds[row.getAttribute 'data-btid']
-        row.className = (row.className || '') + ' ' + cls.detailShow
       newTbody.appendChild row
+      _.each row.cells, (cell, index) ->
+        data = bt.columns[index]
+        if data.hide[breakpointName]
+          cell.style.display = "none"
+      if detailIds[row.getAttribute 'data-btid']
+        detailRow = bt.getDetailRow row
+        if detailRow
+          bt.domUtils.addClass row, cls.detailShow
+          newTbody.appendChild detailRow
 
     bt.table.replaceChild newTbody, tbody
 
@@ -656,8 +646,6 @@ Bartable = (table, options, id) ->
 
     bt._updateBreakpoints()
 
-    bt._updateDetailShowRows()
-
     $table.removeClass cls.loading
     bt.raise evt.redrawn
 
@@ -665,28 +653,21 @@ Bartable = (table, options, id) ->
   bt._updateBreakpoints = ->
     $table = $(bt.table)
     breakpointName = $table.data("breakpoint")
-    # last-child breaks ie8
     _.each bt.table.querySelectorAll("thead##{ids.thead} > tr:last-child > th"), (headCell, index) ->
       data = bt.columns[index]
-      # breaks ie8 support because of nth-child selector
-      selector = "tbody##{ids.tbody} > tr > td:nth-child(" + (index + 1) + ")"
-      selector += ", tfoot##{ids.tfoot} > tr > td:nth-child(" + (index + 1) + ")"
       if data.hide[breakpointName] is false
-        _.each bt.table.querySelectorAll(selector), (cell) ->
-          if cell.style.display
-            cell.style.display = "table-cell"
-          if headCell.style.display
-            headCell.style.display = "table-cell"
+        if headCell.style.display
+          headCell.style.display = "table-cell"
       else
-        _.each bt.table.querySelectorAll(selector), (cell) ->
-          cell.style.display = "none"
-          headCell.style.display = "none"
-    bt
+        headCell.style.display = "none"
 
-  bt._updateDetailShowRows = ->
-    $table = $(bt.table)
-    _.each bt.table.querySelectorAll("tbody##{ids.tbody} > tr.#{cls.detailShow}"), (row) ->
-      bt.createOrUpdateDetailRow(row)?.show()
+    _.each bt.table.querySelectorAll("tfoot##{ids.tfoot} > tr > td"), (cell, index) ->
+      data = bt.columns[index]
+      if data.hide[breakpointName] is false
+        if cell.style.display
+          cell.style.display = "table-cell"
+      else
+        cell.style.display = "none"
     bt
 
   bt.$ = (selector, func) ->
@@ -891,6 +872,26 @@ $.fn.bartable.global =
 
     debug: false
     log: null
+    createDetails: (values) ->
+      detailHtml =  """
+        <table class="table table-condensed table-bordered">
+          <tbody>
+      """
+      for value in values
+        detailHtml += """
+          <tr>
+            <td class="active" width="15%">
+              #{value.name}
+            </td>
+            <td>
+              #{value.display}
+            </td>
+          </tr>
+          """
+      detailHtml += """
+          </tbody>
+        </table>
+        """
 
   version:
     major: 0
