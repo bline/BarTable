@@ -18,7 +18,7 @@ Sort = ->
     low = 0
     while low < high
       mid = (low + high) >>> 1
-      if iterator.call(p, arr[mid]) > value
+      if iterator.call(p, arr[mid]) < value
         low = mid + 1
       else
         high = mid
@@ -29,7 +29,7 @@ Sort = ->
     low = 0
     while low < high
       mid = (low + high) >>> 1
-      if iterator.call(p, arr[mid]) < value
+      if iterator.call(p, arr[mid]) > value
         low = mid + 1
       else
         high = mid
