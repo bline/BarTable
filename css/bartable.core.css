@@ -62,10 +62,10 @@
   color: #888888;
 }
 .bartable > thead > tr > th.bartable-sorted > span.bartable-sort-indicator:before {
-  content: "\e114";
+  content: "\e113";
 }
 .bartable > thead > tr > th.bartable-sorted-desc > span.bartable-sort-indicator:before {
-  content: "\e113";
+  content: "\e114";
 }
 .bartable > tfoot .pagination {
   margin: 0;
