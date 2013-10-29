@@ -621,7 +621,7 @@ Bartable = (table, options, id) ->
 
     detailIds = {}
     _.each tbody.querySelectorAll("tr.#{cls.detailShow}"), (row) ->
-      detailIds[row.getAttribute 'data-btid'] = 1
+      detailIds[row.getAttribute attrs.trow] = 1
 
     # collect detail rows we are displaying
     bt.rowCollection.range start, end, (row) ->
@@ -630,7 +630,7 @@ Bartable = (table, options, id) ->
         data = bt.columns[index]
         if data.hide[breakpointName]
           cell.style.display = "none"
-      if detailIds[row.getAttribute 'data-btid']
+      if detailIds[row.getAttribute attrs.trow]
         detailRow = bt.getDetailRow row
         if detailRow
           bt.domUtils.addClass row, cls.detailShow
