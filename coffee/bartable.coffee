@@ -41,6 +41,14 @@ Bartable = (table, options, id) ->
         @id = null
         @busy = false
 
+  ##########################################################
+  # The following class s thin wrappers around the DOM
+  # for the internal represention we keep of the TBody TR
+  # collection. We use this instead of jQuery because jQuery
+  # is too slow. We also need to keep an internal copy of
+  # the nodes which are not rendered to the DOM
+  ##########################################################
+
   class TableRowCollection
     transformIn: null
     transformOut: null
@@ -481,6 +489,8 @@ Bartable = (table, options, id) ->
         name: name
         value: bt.parse(cell, column)
         display: cell.innerHTML
+        column: column
+        index: index
       true
 
     return null  if values.length is 0 #return if we don't have any data to show
@@ -630,6 +640,8 @@ Bartable = (table, options, id) ->
         data = bt.columns[index]
         if data.hide[breakpointName]
           cell.style.display = "none"
+        else
+          bt.domUtils.addClass cell, "bt-col-" + index
       if detailIds[row.getAttribute attrs.trow]
         detailRow = bt.getDetailRow row
         if detailRow
@@ -743,14 +755,6 @@ Bartable = (table, options, id) ->
       r = (d + Math.random() * 16) % 16 | 0
       d = Math.floor(d / 16)
       ((if c is "x" then r else r & 0x7 | 0x8)).toString 16
-
-  ##########################################################
-  # The following _ methods are thin wrappers around the DOM
-  # for the internal represention we keep of the TBody TR
-  # collection. We use this instead of jQuery because jQuery
-  # is too slow. We also need to keep an internal copy of
-  # the nodes which are not rendered to the DOM
-  ##########################################################
 
 
   bt.raise = (eventName, args) ->
@@ -883,7 +887,7 @@ $.fn.bartable.global =
             <td class="active" width="15%">
               #{value.name}
             </td>
-            <td>
+            <td class="bt-col-#{value.index}">
               #{value.display}
             </td>
           </tr>
