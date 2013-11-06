@@ -279,7 +279,7 @@ Bartable = (table, options, id) ->
     addClass: (node, className) ->
       node.className = _.uniq(String(node.className).split(clSplitRe).concat className).join " "
     hasClass: (node, className) ->
-      _.contain String(node.className).split(clSplitRe), className
+      _.contains String(node.className).split(clSplitRe), className
 
   bt.insertPosition =
     registered: []
@@ -375,7 +375,7 @@ Bartable = (table, options, id) ->
     ).unbind(trg.expandFirstRow).bind(trg.expandFirstRow, ->
       bt.toggleExpandFirst()
     ).unbind(trg.expandAll).bind(trg.expandAll, ->
-      bt.toggleExpendAll()
+      bt.toggleExpandAll()
     ).unbind(trg.collapseAll).bind trg.collapseAll, ->
       bt.toggleCollapseAll()
 
@@ -427,7 +427,7 @@ Bartable = (table, options, id) ->
       bt.toggleDetail $row
     true
 
-  bt.toggleExpendAll = ->
+  bt.toggleExpandAll = ->
     selector = "tbody##{ids.tbody} > tr[#{attrs.trow}]"
     _.each bt.table.querySelectorAll(selector), (row) ->
       bt.domUtils.removeClass row, cls.detailShow
@@ -642,7 +642,7 @@ Bartable = (table, options, id) ->
           cell.style.display = "none"
         else
           bt.domUtils.addClass cell, "bt-col-" + index
-      if detailIds[row.getAttribute attrs.trow]
+      if detailIds[row.getAttribute attrs.trow] or bt.domUtils.hasClass row, cls.detailShow
         detailRow = bt.getDetailRow row
         if detailRow
           bt.domUtils.addClass row, cls.detailShow
