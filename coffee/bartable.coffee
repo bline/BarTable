@@ -884,9 +884,9 @@ $.fn.bartable.global =
       for value in values
         detailHtml += """
           <tr>
-            <td class="active" width="15%">
+            <th class="active" width="20%">
               #{value.name}
-            </td>
+            </th>
             <td class="bt-col-#{value.index}">
               #{value.display}
             </td>
