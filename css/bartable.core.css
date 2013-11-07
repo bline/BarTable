@@ -15,9 +15,6 @@
 .bartable.breakpoint > tbody > tr > td > span.bttg:before {
   content: "\e015";
 }
-.bartable.breakpoint > tbody > tr:hover:not(.bartable-row-detail) {
-  cursor: pointer;
-}
 .bartable.breakpoint > tbody > tr > td.bartable-cell-detail {
   background: #eee;
   border-top: none;
@@ -28,6 +25,7 @@
 .bartable.breakpoint > tbody > tr > td > span.bttg {
   display: inline-block;
   font-family: 'Glyphicons Halflings';
+  cursor: pointer;
   speak: none;
   font-style: normal;
   font-weight: normal;
