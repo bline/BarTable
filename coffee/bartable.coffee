@@ -560,8 +560,6 @@ Bartable = (table, options, id) ->
   bt.resize = ->
     $table = $(bt.table)
     return  unless $table.is(":visible")
-    #we only care about BarTables that are visible
-    return  unless bt.hasAnyBreakpointColumn()
     #we only care about BarTables that have breakpoints
     info =
       width: $table.width() #the table width
