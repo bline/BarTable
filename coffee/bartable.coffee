@@ -491,6 +491,7 @@ Bartable = (table, options, id) ->
         display: cell.innerHTML
         column: column
         index: index
+        cell: cell
       true
 
     return null  if values.length is 0 #return if we don't have any data to show
@@ -880,12 +881,14 @@ $.fn.bartable.global =
           <tbody>
       """
       for value in values
+        classes = value.cell.className or ''
+        classes = " #{classes}" if classes
         detailHtml += """
           <tr>
             <th class="active" width="20%">
               #{value.name}
             </th>
-            <td class="bt-col-#{value.index}">
+            <td class="bt-col-#{value.index}#{classes}">
               #{value.display}
             </td>
           </tr>
