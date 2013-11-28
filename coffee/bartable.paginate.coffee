@@ -251,7 +251,6 @@ Paginate = ->
     return $nav
 
   p.destroy = ->
-    console.log "pagination destroyed"
     bt = p.bartable
     $nav = p.findNav()
     if $nav
